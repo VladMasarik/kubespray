@@ -14,7 +14,7 @@
           HTTPS_PROXY: "{{ https_proxy | default ('') }}"
           no_proxy: "{{ no_proxy | default ('') }}"
           NO_PROXY: "{{ no_proxy | default ('') }}"
-      no_log: true
+      no_log: false
 
 - hosts: bastion[0]
   gather_facts: False

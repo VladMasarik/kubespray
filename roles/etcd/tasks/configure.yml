@@ -1,4 +1,9 @@
 ---
+
+- name: Print etcd access addresses
+  command: echo "{{ etcd_access_addresses }}"
+  when: is_etcd_master and etcd_cluster_setup
+
 - name: Configure | Check if etcd cluster is healthy
   shell: "{{ bin_dir }}/etcdctl --endpoints={{ etcd_access_addresses }} cluster-health | grep -q 'cluster is healthy'"
   register: etcd_cluster_is_healthy

@@ -99,6 +99,19 @@
     - not ignore_assert_errors
     - ip is defined
 
+
+- name: Update before install ping
+  command: apt update
+  when:
+    - access_ip is defined
+    - not ignore_assert_errors
+
+- name: Install ping
+  command: apt install inetutils-ping -y
+  when:
+    - access_ip is defined
+    - not ignore_assert_errors
+
 - name: Stop if access_ip is not pingable
   command: ping -c1 {{ access_ip }}
   when:
