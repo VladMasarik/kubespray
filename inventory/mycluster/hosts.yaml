@@ -5,13 +5,17 @@ all:
       ip: 10.0.1.4
       access_ip: 52.188.109.11
     one:
-      ansible_host: 13.90.116.88
+      ansible_host: 52.168.85.40
       ip: 10.0.1.6
-      access_ip: 13.90.116.88
+      access_ip: 52.168.85.40
     two:
-      ansible_host: 40.121.151.129
+      ansible_host: 52.168.85.53
+      ip: 10.0.1.7
+      access_ip: 52.168.85.53
+    three:
+      ansible_host: 52.168.84.225
       ip: 10.0.1.5
-      access_ip: 40.121.151.129
+      access_ip: 52.168.84.225
   children:
     kube-master:
       hosts:
@@ -21,6 +25,7 @@ all:
         main:
         one:
         two:
+        three:
     etcd:
       hosts:
         main:
