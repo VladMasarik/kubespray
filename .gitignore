@@ -68,6 +68,12 @@ coverage.xml
 *.log
 local_settings.py
 
+# Ansible inventory
+inventory/*
+# !inventory/local
+# !inventory/sample
+# inventory/*/artifacts/
+
 # Flask stuff:
 instance/
 .webassets-cache
