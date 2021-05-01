@@ -69,7 +69,7 @@ coverage.xml
 local_settings.py
 
 # Ansible inventory
-inventory/*
+# inventory/*
 # !inventory/local
 # !inventory/sample
 # inventory/*/artifacts/
