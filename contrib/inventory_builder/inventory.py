@@ -48,7 +48,7 @@ ROLES = ['all', 'kube-master', 'kube-node', 'etcd', 'k8s-cluster',
          'calico-rr']
 PROTECTED_NAMES = ROLES
 AVAILABLE_COMMANDS = ['help', 'print_cfg', 'print_ips', 'print_hostnames',
-                      'load']
+                      'load', 'new']
 _boolean_states = {'1': True, 'yes': True, 'true': True, 'on': True,
                    '0': False, 'no': False, 'false': False, 'off': False}
 yaml = YAML()
@@ -80,6 +80,7 @@ class KubesprayInventory(object):
     def __init__(self, changed_hosts=None, config_file=None):
         self.config_file = config_file
         self.yaml_config = {}
+        loadPreviousConfig = True
         if self.config_file: # Load previous YAML file
             try:
                 self.hosts_file = open(config_file, 'r')
@@ -88,14 +89,19 @@ class KubesprayInventory(object):
                 print(e) # I am assuming we are catching "cannot open file" exceptions
                 sys.exit(1)
         if changed_hosts and changed_hosts[0] in AVAILABLE_COMMANDS: # See whether there are any commands to process
-            self.parse_command(changed_hosts[0], changed_hosts[1:])
-            sys.exit(0)
+            if changed_hosts[0] == "new":
+                loadPreviousConfig = False
+                changed_hosts = changed_hosts[1:]
+            else:
+                self.parse_command(changed_hosts[0], changed_hosts[1:])
+                sys.exit(0)
+                
 
         self.ensure_required_groups(ROLES)
 
         if changed_hosts:
             changed_hosts = self.range2ips(changed_hosts)
-            self.hosts = self.build_hostnames(changed_hosts)
+            self.hosts = self.build_hostnames(changed_hosts,loadPreviousConfig)
             self.purge_invalid_hosts(self.hosts.keys(), PROTECTED_NAMES)
             self.set_all(self.hosts) # just adds the hosts+IPs to the "all" group
             self.set_k8s_cluster()
@@ -156,19 +162,20 @@ class KubesprayInventory(object):
             raise ValueError("Host name must end in an integer")
 
     # Keeps already specified hosts, and adds removes the hosts provided as an argument
-    def build_hostnames(self, changed_hosts):
+    def build_hostnames(self, changed_hosts, loadPreviousConfig):
         existing_hosts = OrderedDict()
         highest_host_id = 0
-        try:    # Load already existing hosts from the YAML
-            for host in self.yaml_config['all']['hosts']:
-                existing_hosts[host] = self.yaml_config['all']['hosts'][host] # Read configuration of an existing host
-                if host.startswith(HOST_PREFIX): # If the existing host seems to have been created automatically, detect its ID
-                    host_id = self.get_host_id(host)
-                    if host_id > highest_host_id:
-                        highest_host_id = host_id
-        except Exception as e:
-            print(e) # I am assuming we are catching automatically created hosts without IDs
-            sys.exit(1)
+        if loadPreviousConfig:
+            try:    # Load already existing hosts from the YAML
+                for host in self.yaml_config['all']['hosts']:
+                    existing_hosts[host] = self.yaml_config['all']['hosts'][host] # Read configuration of an existing host
+                    if host.startswith(HOST_PREFIX): # If the existing host seems to have been created automatically, detect its ID
+                        host_id = self.get_host_id(host)
+                        if host_id > highest_host_id:
+                            highest_host_id = host_id
+            except Exception as e:
+                print(e) # I am assuming we are catching automatically created hosts without IDs
+                sys.exit(1)
 
         # FIXME(mattymo): Fix condition where delete then add reuses highest id
         next_host_id = highest_host_id + 1
