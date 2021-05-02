@@ -1,0 +1,39 @@
+all:
+  hosts:
+    main:
+      ansible_host: 40.71.92.55
+      ip: 10.0.1.9
+      access_ip: 40.71.92.55
+    one:
+      ansible_host: 40.71.88.230
+      ip: 10.0.1.6
+      access_ip: 40.71.88.230
+    two:
+      ansible_host: 40.71.88.241
+      ip: 10.0.1.7
+      access_ip: 40.71.88.241
+    xxx4:
+      ansible_host: 40.71.88.215
+      ip: 10.0.1.5
+      access_ip: 40.71.88.215
+  children:
+    kube-master:
+      hosts:
+        main:
+    kube-node:
+      hosts:
+        main:
+        one:
+        two:
+        xxx4:
+    etcd:
+      hosts:
+        main:
+        one:
+        two:
+    k8s-cluster:
+      children:
+        kube-master:
+        kube-node:
+    calico-rr:
+      hosts: {}

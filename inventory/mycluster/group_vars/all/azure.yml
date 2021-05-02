@@ -1,0 +1,39 @@
+## When azure is used, you need to also set the following variables.
+## see docs/azure.md for details on how to get these values
+
+azure_cloud: AzurePublicCloud
+azure_tenant_id: 336fe738-0868-4d4e-8812-12305db785b5
+azure_subscription_id: 8772a1e4-e918-44cc-a6ae-8f9b0200a894
+azure_aad_client_id: 7c872106-b11e-437b-b82f-131da867054c
+azure_aad_client_secret: e3M-E-wKHOc595urZ2NdF_UWx27-nhqLae
+azure_resource_group: scalingtestresourcegroup
+azure_vnet_resource_group: scalingtestresourcegroup
+azure_security_group_resource_group: scalingtestresourcegroup
+azure_route_table_resource_group: scalingtestresourcegroup
+azure_location: eastus
+azure_subnet_name: scalingtestresourcegroupSubNet
+azure_vnet_name: scalingtestresourcegroupVnet
+azure_security_group_name: mysecgroupname
+azure_route_table_name: myroutetable
+# supported values are 'standard' or 'vmss'
+azure_vmtype: standard
+
+## Azure Disk CSI credentials and parameters
+## see docs/azure-csi.md for details on how to get these values
+
+# azure_csi_tenant_id:
+# azure_csi_subscription_id:
+# azure_csi_aad_client_id:
+# azure_csi_aad_client_secret:
+# azure_csi_location:
+# azure_csi_resource_group:
+# azure_csi_vnet_name:
+# azure_csi_vnet_resource_group:
+# azure_csi_subnet_name:
+# azure_csi_security_group_name:
+# azure_csi_use_instance_metadata:
+
+## To enable Azure Disk CSI, uncomment below
+# azure_csi_enabled: true
+# azure_csi_controller_replicas: 1
+# azure_csi_plugin_image_tag: latest
