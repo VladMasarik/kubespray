@@ -1,29 +1,25 @@
 all:
   hosts:
     main:
-      ansible_host: 40.71.92.55
-      ip: 10.0.1.9
-      access_ip: 40.71.92.55
-    one:
-      ansible_host: 40.71.88.230
-      ip: 10.0.1.6
-      access_ip: 40.71.88.230
-    two:
-      ansible_host: 40.71.88.241
-      ip: 10.0.1.7
-      access_ip: 40.71.88.241
-    xxx4:
-      ansible_host: 40.71.88.215
-      ip: 10.0.1.5
-      access_ip: 40.71.88.215
-    xxx6:
-      ansible_host: 40.71.92.45
-      ip: 10.0.1.8
-      access_ip: 40.71.92.45
-    xxx5:
-      ansible_host: 40.85.189.97
+      ansible_host: 13.68.159.131
       ip: 10.0.1.4
-      access_ip: 40.85.189.97
+      access_ip: 13.68.159.131
+    one:
+      ansible_host: 13.68.153.106
+      ip: 10.0.1.7
+      access_ip: 13.68.153.106
+    two:
+      ansible_host: 13.68.153.193
+      ip: 10.0.1.8
+      access_ip: 13.68.153.193
+    xxx4:
+      ansible_host: 13.68.153.20
+      ip: 10.0.1.5
+      access_ip: 13.68.153.20
+    xxx6:
+      ansible_host: 13.68.153.208
+      ip: 10.0.1.9
+      access_ip: 13.68.153.208
   children:
     kube-master:
       hosts:
@@ -35,7 +31,6 @@ all:
         two:
         xxx4:
         xxx6:
-        xxx5:
     etcd:
       hosts:
         main:
