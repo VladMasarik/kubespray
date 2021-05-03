@@ -44,8 +44,8 @@ import re
 import subprocess
 import sys
 
-ROLES = ['all', 'kube_control_plane', 'kube_node', 'etcd', 'k8s_cluster',
-         'calico_rr']
+ROLES = ['all', 'kube-master', 'kube-node', 'etcd', 'k8s-cluster',
+         'calico-rr']
 PROTECTED_NAMES = ROLES
 AVAILABLE_COMMANDS = ['help', 'print_cfg', 'print_ips', 'print_hostnames',
                       'load', 'add']
@@ -83,14 +83,6 @@ class KubesprayInventory(object):
         self.config_file = config_file
         self.yaml_config = {}
         loadPreviousConfig = False
-        if self.config_file:  # Load previous YAML file
-            try:
-                self.hosts_file = open(config_file, 'r')
-                self.yaml_config = yaml.load(self.hosts_file)
-            except OSError as e:
-                # I am assuming we are catching "cannot open file" exceptions
-                print(e)
-                sys.exit(1)
         # See whether there are any commands to process
         if changed_hosts and changed_hosts[0] in AVAILABLE_COMMANDS:
             if changed_hosts[0] == "add":
@@ -100,12 +92,22 @@ class KubesprayInventory(object):
                 self.parse_command(changed_hosts[0], changed_hosts[1:])
                 sys.exit(0)
 
+        if self.config_file and loadPreviousConfig:  # Load previous YAML file
+            try:
+                self.hosts_file = open(config_file, 'r')
+                self.yaml_config = yaml.load(self.hosts_file)
+            except OSError as e:
+                # I am assuming we are catching "cannot open file" exceptions
+                print(e)
+                sys.exit(1)
+
         self.ensure_required_groups(ROLES)
 
         if changed_hosts:
             changed_hosts = self.range2ips(changed_hosts)
             self.hosts = self.build_hostnames(changed_hosts,
                                               loadPreviousConfig)
+            print(self.hosts)
             self.purge_invalid_hosts(self.hosts.keys(), PROTECTED_NAMES)
             self.set_all(self.hosts)
             self.set_k8s_cluster()
@@ -149,6 +151,7 @@ class KubesprayInventory(object):
         for group in groups:
             if group == 'all':
                 self.debug("Adding group {0}".format(group))
+                print("YAML", self.yaml_config)
                 if group not in self.yaml_config:
                     all_dict = OrderedDict([('hosts', OrderedDict({})),
                                             ('children', OrderedDict({}))])
@@ -296,7 +299,7 @@ class KubesprayInventory(object):
 
     def purge_invalid_hosts(self, hostnames, protected_names=[]):
         for role in self.yaml_config['all']['children']:
-            if role != 'k8s_cluster' and self.yaml_config['all']['children'][role]['hosts']:  # noqa
+            if role != 'k8s-cluster' and self.yaml_config['all']['children'][role]['hosts']:  # noqa
                 all_hosts = self.yaml_config['all']['children'][role]['hosts'].copy()  # noqa
                 for host in all_hosts.keys():
                     if host not in hostnames and host not in protected_names:
@@ -317,7 +320,7 @@ class KubesprayInventory(object):
             if self.yaml_config['all']['hosts'] is None:
                 self.yaml_config['all']['hosts'] = {host: None}
             self.yaml_config['all']['hosts'][host] = opts
-        elif group != 'k8s_cluster:children':
+        elif group != 'k8s-cluster:children':
             if self.yaml_config['all']['children'][group]['hosts'] is None:
                 self.yaml_config['all']['children'][group]['hosts'] = {
                     host: None}
@@ -326,45 +329,45 @@ class KubesprayInventory(object):
 
     def set_kube_control_plane(self, hosts):
         for host in hosts:
-            self.add_host_to_group('kube_control_plane', host)
+            self.add_host_to_group('kube-master', host)
 
     def set_all(self, hosts):
         for host, opts in hosts.items():
             self.add_host_to_group('all', host, opts)
 
     def set_k8s_cluster(self):
-        k8s_cluster = {'children': {'kube_control_plane': None,
-                                    'kube_node': None}}
-        self.yaml_config['all']['children']['k8s_cluster'] = k8s_cluster
+        k8s_cluster = {'children': {'kube-master': None,
+                                    'kube-node': None}}
+        self.yaml_config['all']['children']['k8s-cluster'] = k8s_cluster
 
     def set_calico_rr(self, hosts):
         for host in hosts:
-            if host in self.yaml_config['all']['children']['kube_control_plane']: # noqa
-                self.debug("Not adding {0} to calico_rr group because it "
-                           "conflicts with kube_control_plane "
+            if host in self.yaml_config['all']['children']['kube-master']: # noqa
+                self.debug("Not adding {0} to calico-rr group because it "
+                           "conflicts with kube-master "
                            "group".format(host))
                 continue
-            if host in self.yaml_config['all']['children']['kube_node']:
-                self.debug("Not adding {0} to calico_rr group because it "
-                           "conflicts with kube_node group".format(host))
+            if host in self.yaml_config['all']['children']['kube-node']:
+                self.debug("Not adding {0} to calico-rr group because it "
+                           "conflicts with kube-node group".format(host))
                 continue
-            self.add_host_to_group('calico_rr', host)
+            self.add_host_to_group('calico-rr', host)
 
     def set_kube_node(self, hosts):
         for host in hosts:
             if len(self.yaml_config['all']['hosts']) >= SCALE_THRESHOLD:
                 if host in self.yaml_config['all']['children']['etcd']['hosts']:  # noqa
-                    self.debug("Not adding {0} to kube_node group because of "
+                    self.debug("Not adding {0} to kube-node group because of "
                                "scale deployment and host is in etcd "
                                "group.".format(host))
                     continue
             if len(self.yaml_config['all']['hosts']) >= MASSIVE_SCALE_THRESHOLD:  # noqa
-                if host in self.yaml_config['all']['children']['kube_control_plane']['hosts']:  # noqa
-                    self.debug("Not adding {0} to kube_node group because of "
+                if host in self.yaml_config['all']['children']['kube-master']['hosts']:  # noqa
+                    self.debug("Not adding {0} to kube-node group because of "
                                "scale deployment and host is in "
-                               "kube_control_plane group.".format(host))
+                               "kube-master group.".format(host))
                     continue
-            self.add_host_to_group('kube_node', host)
+            self.add_host_to_group('kube-node', host)
 
     def set_etcd(self, hosts):
         for host in hosts:
