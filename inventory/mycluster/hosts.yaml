@@ -16,6 +16,10 @@ all:
       ansible_host: 137.135.64.227
       ip: 10.0.1.6
       access_ip: 137.135.64.227
+    xxx6:
+      ansible_host: 137.135.65.37
+      ip: 10.0.1.9
+      access_ip: 137.135.65.37
   children:
     kube-master:
       hosts:
@@ -26,6 +30,7 @@ all:
         one:
         two:
         xxx4:
+        xxx6:
     etcd:
       hosts:
         main:
