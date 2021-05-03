@@ -16,6 +16,10 @@ all:
       ansible_host: 13.90.146.51
       ip: 10.0.1.9
       access_ip: 13.90.146.51
+    xxx6:
+      ansible_host: 52.168.33.224
+      ip: 10.0.1.4
+      access_ip: 52.168.33.224
     xxx7:
       ansible_host: 40.76.23.210
       ip: 10.0.1.5
@@ -30,6 +34,7 @@ all:
         one:
         two:
         xxx4:
+        xxx6:
         xxx7:
     etcd:
       hosts:
