@@ -91,6 +91,8 @@ class KubesprayInventory(object):
             else:
                 self.parse_command(changed_hosts[0], changed_hosts[1:])
                 sys.exit(0)
+        if changed_hosts[0][0] == "-":
+            loadPreviousConfig = True
 
         if self.config_file and loadPreviousConfig:  # Load previous YAML file
             try:
