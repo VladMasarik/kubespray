@@ -24,14 +24,10 @@ all:
       ansible_host: 10.0.1.7
       ip: 10.0.1.7
       access_ip: 10.0.1.7
-    xxxscalm4000000:
-      ansible_host: 10.0.1.11
-      ip: 10.0.1.11
-      access_ip: 10.0.1.11
-    xxxscalm4000001:
-      ansible_host: 10.0.1.12
-      ip: 10.0.1.12
-      access_ip: 10.0.1.12
+    xxx8:
+      ansible_host: 10.0.1.10
+      ip: 10.0.1.10
+      access_ip: 10.0.1.10
   children:
     kube-master:
       hosts:
@@ -44,8 +40,7 @@ all:
         xxx4:
         xxx6:
         xxx7:
-        xxxscalm4000000:
-        xxxscalm4000001:
+        xxx8:
     etcd:
       hosts:
         main:
